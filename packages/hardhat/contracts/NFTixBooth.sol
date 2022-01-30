@@ -4,6 +4,7 @@ pragma solidity >=0.8.0 <0.9.0;
 
 import "hardhat/console.sol";
 import "@openzeppelin/contracts/token/ERC721/extensions/ERC721URIStorage.sol";
+import "@openzeppelin/contracts/access/Ownable.sol";
 import "@openzeppelin/contracts/utils/Counters.sol";
 import "@openzeppelin/contracts/utils/Strings.sol";
 
@@ -12,13 +13,14 @@ import "./Base64.sol";
 
 // Final repo: https://github.com/ryancharris/nftix-demo-ui
 
-contract NFTixBooth is ERC721URIStorage {
+contract NFTixBooth is ERC721URIStorage, Ownable {
     using Counters for Counters.Counter;
     Counters.Counter private currentId;
 
     bool public saleIsActive = false;
     uint256 public totalTickets = 10;
     uint256 public availableTickets = 10;
+    uint256 public mintPrice = 800000000000000;
 
     mapping(address => uint256[]) public holderTokenIDs;
 
@@ -27,8 +29,10 @@ contract NFTixBooth is ERC721URIStorage {
         console.log("NFTixBooth created", currentId.current());
     }
 
-    function mint() public {
+    function mint() public payable {
         require(availableTickets > 0, "No more tickets available");
+        require(msg.value >= mintPrice, "Not enough ETH!");
+        require(saleIsActive, "Ticket are not for sale!");
 
         string[3] memory svg;
         svg[
@@ -81,11 +85,11 @@ contract NFTixBooth is ERC721URIStorage {
         return totalTickets;
     }
 
-    function openSale() public {
+    function openSale() public onlyOwner {
         saleIsActive = true;
     }
 
-    function closeSale() public {
+    function closeSale() public onlyOwner {
         saleIsActive = false;
     }
 }
