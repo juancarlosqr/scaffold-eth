@@ -32,7 +32,7 @@ contract NFTixBooth is ERC721URIStorage, Ownable {
     function mint() public payable {
         require(availableTickets > 0, "No more tickets available");
         require(msg.value >= mintPrice, "Not enough ETH!");
-        require(saleIsActive, "Ticket are not for sale!");
+        require(saleIsActive, "Tickets are not for sale!");
 
         string[3] memory svg;
         svg[
